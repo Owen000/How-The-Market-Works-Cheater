@@ -2,7 +2,7 @@ import requests
 import random
 import math
 import mechanize
-import cookielib
+import http.cookiejar
 from pyquery import PyQuery as pq
 import time
 import re
@@ -20,7 +20,7 @@ trade_url = "http://www.howthemarketworks.com/trading/trade.php"
 def sign_in(username, password):
     base_url = "http://www.howthemarketworks.com/trading/index.php"
     br = mechanize.Browser()
-    cj = cookielib.LWPCookieJar()
+    cj = http.cookiejar.LWPCookieJar()
     br.set_cookiejar(cj)
     br.set_handle_robots(False)
     br.addheaders = [('User-agent', 'Firefox')]
@@ -97,78 +97,78 @@ if __name__ == "__main__" and datetime.now().hour >= 9 and datetime.now().hour <
         cycle += 1
         time.sleep(1)
         last_time = time.time()
-        print "getting mean stock price for {}\n\n".format(stock)
+        print("getting mean stock price for {}\n\n".format(stock))
         c = get_mean_stock_price(stock)
-        print "Stock Prices: Google:[mean: {} last: {}] HMW: {}".format(c[0], c[1], c[2])
+        print("Stock Prices: Google:[mean: {} last: {}] HMW: {}".format(c[0], c[1], c[2]))
         shares = max_shares(stock)
 
-        print "Buy Condition: {} {}".format(profit(shares, c[0], c[2], fee=fee), profit(shares, c[1], c[2], fee=fee))
-        print "Short Condition: {} {}".format(profit(shares * 2, c[0], c[2], fee=fee, trans="short"), profit(shares * 2, c[1], c[2], fee=fee, trans="short"))
+        print("Buy Condition: {} {}".format(profit(shares, c[0], c[2], fee=fee), profit(shares, c[1], c[2], fee=fee)))
+        print("Short Condition: {} {}".format(profit(shares * 2, c[0], c[2], fee=fee, trans="short"), profit(shares * 2, c[1], c[2], fee=fee, trans="short")))
         if (profit(shares, c[0], c[2], fee=fee) > min_profit) and (profit(shares, c[1], c[2], fee=fee) > min_profit):
-            print "Upside: {}".format(profit(shares, c[1], c[2], fee=fee))
+            print("Upside: {}".format(profit(shares, c[1], c[2], fee=fee)))
             make_transaction("buy", stock, shares)
-            print "buying {}".format(stock)
+            print("buying {}".format(stock))
             last_time = time.time()
             while True:
                 try:
                     n = get_hmw_price(stock)
                 except:
-                    print "n is invalid, breaking"
+                    print("n is invalid, breaking")
                     time.sleep(3)
                     make_transaction("sell", stock, shares)
                     break
                 goog_price = get_google_price(stock)["price"]
-                print "Current Price: {}, Projected Price: {}, Google Price: {}".format(n, c[1], goog_price)
+                print("Current Price: {}, Projected Price: {}, Google Price: {}".format(n, c[1], goog_price))
                 if n >= goog_price:
                     time.sleep(3)
                     make_transaction("sell", stock, shares)
-                    print "selling {} at {}".format(stock, n)
+                    print("selling {} at {}".format(stock, n))
                     break
                 elif n < (c[2] - .01):
                     time.sleep(3)
                     make_transaction("sell", stock, shares)
-                    print "sell {} at {} due to unprojected decrease".format(stock, n)
+                    print("sell {} at {} due to unprojected decrease".format(stock, n))
                     break
                 elif goog_price < (c[1] - .01):
                     cycle -= 1
                     time.sleep(3)
                     make_transaction("sell", stock, shares)
                 elif (time.time() - last_time > timeout):
-                    print "Time Ran Out!!!"
+                    print("Time Ran Out!!!")
                     time.sleep(3)
                     make_transaction("sell", stock, shares)
                     break
         elif (profit(shares * 2, c[0], c[2], fee=fee, trans="short") > min_profit) and (profit(shares * 2, c[1], c[2], fee=fee, trans="short") > min_profit):
-            print "Upside: {}".format(profit(shares * 2, c[0], c[2], fee=fee, trans="short"))
+            print("Upside: {}".format(profit(shares * 2, c[0], c[2], fee=fee, trans="short")))
             make_transaction("short", stock, shares * 2)
-            print "shorting {}".format(stock)
+            print("shorting {}".format(stock))
             last_time = time.time()
             while True:
                 try:
                     n = get_hmw_price(stock)
                 except:
-                    print "n is invalid, breaking"
+                    print("n is invalid, breaking")
                     time.sleep(3)
                     make_transaction("cover", stock, shares * 2)
                     break
                 goog_price = get_google_price(stock)["price"]
-                print "Current Price: {}, Projected Price: {}, Google Price: {}".format(n, c[1], goog_price)
+                print("Current Price: {}, Projected Price: {}, Google Price: {}".format(n, c[1], goog_price))
                 if n <= goog_price:
                     time.sleep(3)
                     make_transaction("cover", stock, shares * 2)
-                    print "covering {} at {}".format(stock, n)
+                    print("covering {} at {}".format(stock, n))
                     break
                 elif n > (c[2] + .01):
                     time.sleep(3)
                     make_transaction("cover", stock, shares * 2)
-                    print "covering {} at {} due to unprojected increase".format(stock, n)
+                    print("covering {} at {} due to unprojected increase".format(stock, n))
                     break
                 elif goog_price > (c[1] + .01):
                     time.sleep(3)
                     make_transaction("cover", stock, shares * 2)
                 elif (time.time() - last_time > timeout):
-                    print "Time Ran Out!!!"
+                    print("Time Ran Out!!!")
                     time.sleep(3)
                     make_transaction("cover", stock, shares * 2)
                     break
-        print "%.2fs" % (time.time() - last_time)
+        print("%.2fs" % (time.time() - last_time))
