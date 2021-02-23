@@ -2,6 +2,8 @@
 
 Fork of a old project I found, I theorized that this could be possible but it looks like somone already made a script for it.
 
+Just figured out that this project needs completely reworked due to infrastructure changes on HTMW. Will take more time than expected.
+
 # Instructions
 
 # Completed
