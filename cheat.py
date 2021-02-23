@@ -14,11 +14,11 @@ __cookies__ = {'incap_ses_240_402322': 'trkeXFKxVzoJ+kjAHqdUA+kndlUAAAAA9x4JQslw
                '136990abe0dbf91e4e69efd5247230fc', 'login_email': 'evan.mosseri%40gmail.com', 'visid_incap_402322': 'QR1s2ov6RdSfkIAVrm21/ekndlUAAAAAQUIPAAAAAABAN7Qn0gNloijni+3+7H/y'}
 old_cookies = __cookies__
 
-trade_url = "http://www.howthemarketworks.com/trading/trade.php"
+trade_url = "https://www.howthemarketworks.com/trading/equities"
 
 
 def sign_in(username, password):
-    base_url = "http://www.howthemarketworks.com/trading/index.php"
+    base_url = "https://www.howthemarketworks.com/login"
     br = mechanize.Browser()
     cj = http.cookiejar.LWPCookieJar()
     br.set_cookiejar(cj)
